@@ -1,0 +1,16 @@
+ManifestFileVersion: 0
+CRC: 3764903283
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: prefab/player
+      Dependencies: {}
+    Info_1:
+      Name: prefab/build
+      Dependencies: {}
+    Info_2:
+      Name: prefab/brick
+      Dependencies: {}
+    Info_3:
+      Name: prefab/score_text
+      Dependencies: {}
