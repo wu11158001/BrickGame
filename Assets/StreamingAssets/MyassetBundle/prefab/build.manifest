@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2491219738
+CRC: 3716338539
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 74e7acd540a3c43bb542ed09f8be483b
+    Hash: a2c503266478cab927588041d2e37fd3
   TypeTreeHash:
     serializedVersion: 2
     Hash: 98784d53afbd8302e1bef29cd270ee85
@@ -34,4 +34,5 @@ ClassTypes:
 SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/Prefab/Build.prefab
+- Assets/Prefab/BrickArea.prefab
 Dependencies: []

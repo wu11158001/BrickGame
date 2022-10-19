@@ -9,9 +9,9 @@ public class BuildArea : MonoBehaviour
 {
     //建造面積
     const int buildWidth = 4;//建造寬度
-    const int buildLength = 5;//建造長度    
-    [SerializeField]float areaSizeX;//建造區域物件SizeX
-    float areaSizeZ;//建造區域物件SizeZ
+    const int buildLength = 6;//建造長度    
+    const float areaSizeX = 1.8f;//建造區域物件SizeX
+    const float areaSizeZ = 2.0f;//建造區域物件SizeZ
 
     //目前建造面積
     int width;//目前建造寬度
@@ -22,15 +22,13 @@ public class BuildArea : MonoBehaviour
     const float initialFallHight = 5;//初始落下高度
     List<BrickFall> brickFall_List = new List<BrickFall>();//紀錄落下磚塊
 
+    Vector3 brickSize;//磚塊Size
+
     //分數物件
-    ScoreText scoreObject;
+    BuildCountText scoreObject;
     
     private void Awake()
     {
-        //建造面積
-        areaSizeX = GetComponent<MeshFilter>().mesh.bounds.size.x / 3;//建造區域物件SizeX
-        areaSizeZ = GetComponent<MeshFilter>().mesh.bounds.size.z / 3;//建造區域物件SizeZ
-
         //目前建造面積
         width = -1;//目前建造寬度
         hight = 0.5f;//目前建造高度
@@ -44,7 +42,7 @@ public class BuildArea : MonoBehaviour
     /// <summary>
     /// 設定分數物件
     /// </summary>
-    public ScoreText SetScoreObject { set { scoreObject = value; } }
+    public BuildCountText SetScoreObject { set { scoreObject = value; } }
 
     /// <summary>
     /// 磚塊落下
@@ -89,7 +87,7 @@ public class BuildArea : MonoBehaviour
         }
 
         //磚塊擺放位置
-        Vector3 brickSize = GameManagement.Instance.GetBrickSize;//獲取磚塊Size
+        brickSize = brickSize == Vector3.zero ? birck.GetComponent<MeshFilter>().mesh.bounds.size : brickSize;//磚塊Size
         float X = -areaSizeX + (brickSize.x * width);
         float Y = brickSize.y * hight;
         float Z = areaSizeZ - (brickSize.z * length);

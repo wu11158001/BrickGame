@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,8 +24,12 @@ public class PlayerControl : MonoBehaviour
     Vector3 objectForward;//物件前方向量
 
     //磚塊
-    const float dorpBrickSpeed = 0.1f;//放下磚塊速度
-    float dorpBrickCountdown;//放下磚塊(計時器)
+    const float moveBrickSpeed = 0.1f;//移動磚塊速度
+    const int maxAvailableQuantity = 50;//最大可擁有數量
+    int currentBrick;//目前擁有磚塊
+    Transform brickParent;//磚塊父物件
+    readonly Vector3 initialBrickPosition = new Vector3(0, 1f, -0.3f);////磚塊擺放位置    
+    float dorpBrickCountdown;//放下磚塊(計時器)    
 
     private void Awake()
     {
@@ -35,13 +40,15 @@ public class PlayerControl : MonoBehaviour
         //向量
         objectForward = transform.forward;
 
+        brickParent = FindChildMethod.OnFindChild<Transform>(transform, "Bricks");//磚塊擺放位置
+
         CameraControl.Instance.SetTargetObject = transform;//設定攝影機跟隨物件
     }
 
     private void Update()
     {
         OnMoveControl();//移動控制        
-        OnCollisionOfBuildArea();//建造區域碰撞
+        OnCollsion();//碰撞        
         OnExitGame();//離開遊戲
     }
 
@@ -101,19 +108,40 @@ public class PlayerControl : MonoBehaviour
     }
 
     /// <summary>
-    /// 建造區域碰撞
+    /// 碰撞
     /// </summary>
-    void OnCollisionOfBuildArea()
+    void OnCollsion()
     {
-        Collider[] colliders = Physics.OverlapBox(transform.position + boxCollider.center, boxCollider.size, Quaternion.Euler(transform.localEulerAngles), 1 << LayerMask.NameToLayer("Build"));
+        Collider[] obj_buildArea = OnCollisionArea("BuildArea");//建造區域碰撞
+        Collider[] obj_brickArea = OnCollisionArea("BrickArea");//磚塊區域碰撞        
 
-        foreach (var area in colliders)
+        OnAreaBehavior(colliders: obj_buildArea, action: OnDropBrick);//建造區域碰撞
+        OnAreaBehavior(colliders: obj_brickArea, action: OnTakeBruck);//磚塊區域碰撞
+    }
+
+    /// <summary>
+    /// 碰撞區域
+    /// </summary>
+    /// <param name="layer">碰撞Layer</param>
+    Collider[] OnCollisionArea(string layer)
+    {
+        return Physics.OverlapBox(transform.position + boxCollider.center, boxCollider.size, Quaternion.Euler(transform.localEulerAngles), 1 << LayerMask.NameToLayer(layer));
+    }
+
+    /// <summary>
+    /// 碰撞區域行為
+    /// </summary>
+    /// <param name="colliders">碰撞區域</param>
+    /// <param name="action">執行涵式</param>
+    void OnAreaBehavior(Collider[] colliders, Action<Transform> action)
+    {
+        if(colliders.Length > 0)
         {
             dorpBrickCountdown -= Time.deltaTime;//放下磚塊(計時器)
-            if(dorpBrickCountdown <= 0)
+            if (dorpBrickCountdown <= 0)
             {
-                dorpBrickCountdown = dorpBrickSpeed;//重製放下磚塊(計時器)
-                DnDropBrick(area.transform);//放下磚塊
+                dorpBrickCountdown = moveBrickSpeed;//重製放下磚塊(計時器)
+                action.Invoke(colliders[0].transform);
             }
         }
     }
@@ -122,12 +150,32 @@ public class PlayerControl : MonoBehaviour
     /// 放下磚塊
     /// </summary>
     /// <param name="area">建造區域</param>
-    void DnDropBrick(Transform area)
+    void OnDropBrick(Transform area)
     {
         Transform obj_bricks = FindChildMethod.OnFindChild<Transform>(transform, "Bricks");
         if (obj_bricks.childCount > 0)
         {
-            area.GetComponent<BuildArea>().OnBuildPosition(obj_bricks.GetChild(obj_bricks.childCount - 1));            
+            area.GetComponent<BuildArea>().OnBuildPosition(obj_bricks.GetChild(obj_bricks.childCount - 1));
+            currentBrick--;//目前擁有磚塊數量
+        }
+    }
+
+    /// <summary>
+    /// 拿起磚塊
+    /// </summary>
+    /// <param name="area"></param>
+    void OnTakeBruck(Transform area)
+    {
+        if (currentBrick < maxAvailableQuantity)//目前擁有磚塊數量
+        {
+            Transform brick = area.GetComponent<BrickArea>().OnGetBrick();//獲取磚塊
+            if (brick == null) return;
+            brick.SetParent(brickParent);//設定Parent
+            Vector3 brickSize = brick.GetComponent<MeshFilter>().mesh.bounds.size;//磚塊Size
+            brick.transform.localPosition = new Vector3(initialBrickPosition.x, initialBrickPosition.y + (brickSize.y / 3 * currentBrick), initialBrickPosition.z);//位置
+            brick.localRotation = Quaternion.Euler(Vector3.zero);//選轉
+
+            currentBrick++;//目前擁有磚塊數量
         }
     }
 }

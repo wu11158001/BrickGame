@@ -1,5 +1,5 @@
 ManifestFileVersion: 0
-CRC: 3764903283
+CRC: 602837380
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
@@ -12,5 +12,5 @@ AssetBundleManifest:
       Name: prefab/brick
       Dependencies: {}
     Info_3:
-      Name: prefab/score_text
+      Name: prefab/buildcount_text
       Dependencies: {}
