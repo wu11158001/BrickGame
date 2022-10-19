@@ -14,7 +14,7 @@ public class BuildCountText : MonoBehaviour
 
     //硑计秖
     int currentCount;//ヘ玡计秖
-    const int completeCount = 100;//硑ЧΘ计秖
+    const int completeCount = 30;//硑ЧΘ计秖
     const int addScore = 100;//だ
 
     private void Awake()
@@ -38,20 +38,24 @@ public class BuildCountText : MonoBehaviour
     /// <summary>
     /// 糤だ计
     /// </summary>
-    public void OnSetScore()
+    public bool OnSetScore()
     {
+        bool isComplete = false;//琌硑ЧΘ
         currentCount++;//ヘ玡计秖糤
 
         //ЧΘ硑计秖
         if (currentCount == completeCount)
         {
+            isComplete = true;//琌硑ЧΘ
             currentCount = 0;
             GameManagement.Instance.currentScore += addScore;//だ
             GameManagement.Instance.score_Text.text = $"だ计: {GameManagement.Instance.currentScore}";
         }
 
         //ゅ
-        thisText.text = currentCount + "/" + completeCount;        
+        thisText.text = currentCount + "/" + completeCount;
+
+        return isComplete;
     }
 
     /// <summary>

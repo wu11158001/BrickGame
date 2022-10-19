@@ -11,6 +11,7 @@ public class GameManagement : MonoBehaviour
     //Component
     static GameManagement gameManagement;
     public static GameManagement Instance => gameManagement;
+    ObjectPool objectPool = new ObjectPool();//物件池
     Canvas canvas;
 
     //AssetBundle
@@ -35,6 +36,9 @@ public class GameManagement : MonoBehaviour
 
     //分數
     public int currentScore;//目前分數
+
+    [Header("紀錄")]
+    Dictionary<string, int> objectsNumber = new Dictionary<string, int>();//物件池編號
 
     private void Awake()
     {
@@ -118,9 +122,55 @@ public class GameManagement : MonoBehaviour
         GameObject obj_Player = Instantiate(playerObject, Vector3.zero, Quaternion.identity);
         if (!obj_Player.TryGetComponent<PlayerControl>(out PlayerControl playerControl)) obj_Player.AddComponent<PlayerControl>();//加入玩家控制腳本    
 
+        OnObjectPool();//物件池
         OnCreateBuildArea();//創建建造區域物件             
-        OnCreateBrickArea();//創建磚塊區域物件
-        //OnCreateBrick();//創建磚塊
+        OnCreateBrickArea();//創建磚塊區域物件        
+    }
+
+    /// <summary>
+    /// 物件池
+    /// </summary>
+    void OnObjectPool()
+    {
+        //創建物件池物件
+        objectPool = ObjectPool.Instance;//物件池實例化
+
+        int number = 0;//編號
+
+        //磚塊
+        number = objectPool.OnCreateAndRecordOnject(brickObject);
+        objectsNumber.Add("Brick", number);
+    }
+
+    /// <summary>
+    /// 獲取物件編號
+    /// </summary>
+    /// <param name="objName"></param>
+    int OnGetObjectNumber(string objName)
+    {
+        int number = -1;
+
+        foreach (var obj in objectsNumber)
+        {
+            if (obj.Key == objName)
+            {
+                number = obj.Value;
+            }
+        }
+
+        return number;
+    }
+
+    /// <summary>
+    /// 獲取物件池物件
+    /// </summary>
+    /// <param name="serchName">尋找物件名稱</param>
+    /// <returns></returns>
+    public GameObject OnGetObjectPool(string serchName)
+    {
+        GameObject obj = objectPool.OnActiveObject(OnGetObjectNumber(serchName));//激活物件
+
+        return obj;
     }
 
     /// <summary>
@@ -140,7 +190,7 @@ public class GameManagement : MonoBehaviour
             obj_score_Text.transform.SetParent(canvas.transform);
             if (!obj_score_Text.TryGetComponent<BuildCountText>(out BuildCountText scoreText)) scoreText = obj_score_Text.AddComponent<BuildCountText>();
             scoreText.SetTarget = obj_build.transform;//設定建造數量文字目標
-            buildArea.SetScoreObject = scoreText.GetComponent<BuildCountText>();//設定建造區域建造數量文字
+            buildArea.SetBuildCountTextObject = scoreText.GetComponent<BuildCountText>();//設定建造區域建造數量文字
         }
     }
 

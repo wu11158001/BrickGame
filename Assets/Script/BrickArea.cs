@@ -90,7 +90,8 @@ public class BrickArea : MonoBehaviour
         yield return new WaitForSeconds(createSpeed);
 
         //創建磚塊
-        Transform obj_brick = Instantiate(GameManagement.Instance.brickObject.transform);
+        Transform obj_brick = GameManagement.Instance.OnGetObjectPool("Brick").transform;
+        obj_brick.localScale = Vector3.one;
         obj_brick.gameObject.layer = LayerMask.NameToLayer("Brick");//物件Layer
         obj_brick.SetParent(transform);
         brickSize = brickSize == Vector3.zero ? obj_brick.GetComponent<MeshFilter>().mesh.bounds.size : brickSize;//磚塊Size

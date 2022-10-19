@@ -153,6 +153,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brickObject: {fileID: 0}
+  score_Text: {fileID: 0}
+  currentScore: 0
 --- !u!4 &700626622
 Transform:
   m_ObjectHideFlags: 0

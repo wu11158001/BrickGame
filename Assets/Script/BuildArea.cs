@@ -20,17 +20,27 @@ public class BuildArea : MonoBehaviour
 
     //磚塊落下
     const float initialFallHight = 5;//初始落下高度
+    List<GameObject> brick_List = new List<GameObject>();//紀錄建造磚塊
     List<BrickFall> brickFall_List = new List<BrickFall>();//紀錄落下磚塊
 
     Vector3 brickSize;//磚塊Size
 
-    //分數物件
-    BuildCountText scoreObject;
+    //建造數量文字物件
+    BuildCountText buildCountTextObject;
     
     private void Awake()
     {
+        OnInitial();//初始化
+    }
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    void OnInitial()
+    {
         //目前建造面積
         width = -1;//目前建造寬度
+        length = 0;//目前建造長度  
         hight = 0.5f;//目前建造高度
     }
 
@@ -40,9 +50,9 @@ public class BuildArea : MonoBehaviour
     }
 
     /// <summary>
-    /// 設定分數物件
+    /// 設定建造數量文字物件
     /// </summary>
-    public BuildCountText SetScoreObject { set { scoreObject = value; } }
+    public BuildCountText SetBuildCountTextObject { set { buildCountTextObject = value; } }
 
     /// <summary>
     /// 磚塊落下
@@ -97,15 +107,27 @@ public class BuildArea : MonoBehaviour
         birck.SetParent(transform);
         birck.localPosition = position;
         birck.localRotation = Quaternion.Euler(Vector3.zero);
+        brick_List.Add(birck.gameObject);//紀錄建造磚塊
 
-        //紀錄
+        //紀錄落下磚塊
         BrickFall brickFall = new BrickFall();
         brickFall.obj = birck;//落下物件
         brickFall.targetPositionY = Y;//目標位置Y
         brickFall_List.Add(brickFall);//紀錄落下磚塊
 
         //增加分數
-        scoreObject.OnSetScore();
+        if(buildCountTextObject.OnSetScore())
+        {
+            foreach (var brick in brick_List)
+            {
+                brick.SetActive(false);//關閉磚塊物件
+            }
+
+            //清除紀錄
+            brickFall_List.Clear();
+            brick_List.Clear();
+            OnInitial();//初始化
+        }
     }
 }
 
